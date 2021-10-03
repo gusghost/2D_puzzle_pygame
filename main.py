@@ -16,55 +16,55 @@ sc_width = pygame.display.get_window_size()[0]
 sc_height = pygame.display.get_window_size()[1]
 
 #Player
-
-class map_chip_class():
-    def __init__(self, type):
-        self.chipType = type
-        self.chip_location =[]
-    def generate_chip(self, chipType):
-        chip = chipType
-
-#BG
-def create_chip_image(type):
-    # type = "string"
-    chiptype = type
-    chipimage = pygame.image.load("{}.png".format(chiptype))
-    chipimage = pygame.transform.scale(chipimage,(100,100))
-    return chipimage
-
-def stage_gene(stage_No=0):
-    chip = create_chip_image("O")
-    W = chip.get_width()
-    H = chip.get_height()
-
-    stage = stageMap.stage_select(stage_No)
-    stageW = len(stage[0])
-    stageH = len(stage)
-    marginX = (sc_width-(stageW*W))/2
-    marginH = (sc_height-(stageH*H))/2
-    margin = (marginX, marginH)
-    return stage, margin
-
-stage_num = 2
+stage_num = 4
 selected_stage = stage_gene(stage_num)
+class map_chip_class():
+    def __init__(self, location):
+        self.chipType = ""
+        self.chip_location = location
+        self.chip_action = "none" # none, jump, drop, stop, turn
+        self.arrow_direction = [0,1]
+    #BG
+    def create_chip_image(self):
+        # type = "string"
+        chiptype = self.chiptype
+        chipimage = pygame.image.load("{}.png".format(chiptype))
+        chipimage = pygame.transform.scale(chipimage,(100,100))
+        return chipimage
 
-def tiling_chip(index = 0):
-    stage_index = index
-    gene = stage_gene(stage_index)
-    map  = gene[0]
-    margin = gene[1]
-    gridsizex = len(map[stage_index])
-    gridsizey = len(map)
+    def stage_gene(self, stage_No=0):
+        chip = self.create_chip_image("O")
+        W = chip.get_width()
+        H = chip.get_height()
 
-    t = "O"
-    for i in range(gridsizex):
-        for d in range(gridsizey):
-            t = map[d][i]
-            tile = create_chip_image(t)   
-            tileX = tile.get_width()
-            tileY = tile.get_height()
-            screen.blit(tile,(margin[0]+tileX*i, margin[1] + tileY*d)) 
+        stage = stageMap.stage_select(stage_No)
+        stageW = len(stage[0])
+        stageH = len(stage)
+        marginX = (sc_width-(stageW*W))/2
+        marginH = (sc_height-(stageH*H))/2
+        margin = (marginX, marginH)
+        return stage, margin
 
+    def get_chip_attr(self):
+
+        return
+
+def tiling_chip(self, index):
+        # index = int
+        gene = stage_gene(index)
+        map  = gene[0]
+        margin = gene[1]
+        gridsizex = len(map[index])
+        gridsizey = len(map)
+
+        t = "O"
+        for i in range(gridsizex):
+            for d in range(gridsizey):
+                t = map[d][i]
+                tile = create_chip_image(t)   
+                tileX = tile.get_width()
+                tileY = tile.get_height()
+                screen.blit(tile,(margin[0]+tileX*i, margin[1] + tileY*d))
 
 class player_class():
 
@@ -74,7 +74,7 @@ class player_class():
         self.playerImg =  pygame.transform.scale(self.playerImg,(120,300))
         self.player_start_point = [2,1] # grid
         self.pixel_imalocacion = [0, 0]
-        self.player_direction = "" # Up, Down, Left, Right
+        self.player_direction = [1,0] # Up[0,-1], Down[0,1], Left[-1,0], Right[1,0]
         self.player_status = ""
         self.player_HP = 20
 
@@ -116,9 +116,20 @@ class player_class():
         imalocationY += numpy.sign(mokuhyou[1]) * min(abs(mokuhyou[1]), speed)
 
         return (imalocationX, imalocationY)
-    def find_player_destination(self):
-        grid_location = []
 
+    def find_player_destination(self):
+        # 現在位置、プレイヤーの向き、マップチップから目標マス座標を決める
+        grid_location = []
+        stage  =stage_gene(stage_num)[0]
+        direction = self.player_direction
+        location = self.location
+        length = max(len(stage), len(stage[0]))
+        for i in range(length):
+            location = location + direction 
+            chip = stage[location[0]][location[1]]
+            
+
+        grid_location = []
         return grid_location
 
     def hamidasanai(self, location):
@@ -136,7 +147,10 @@ class player_class():
         
         return (playerX, playerY)
 
-
+def puzzle_select():
+    # 後でちゃんと書いてね
+    stage_bangou = 1
+    return stage_bangou
 
 object_player = player_class()
 object_player.location = object_player.player_start_point
@@ -153,14 +167,14 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 puzzle_state = 1 # 適当に書いている
-            if event.key == pygame.K_LEFT:
-                object_player.location[0] += -1
-            if event.key == pygame.K_RIGHT:
-                object_player.location[0] += 1
-            if event.key == pygame.K_UP:          
-                object_player.location[1] += -1
-            if event.key == pygame.K_DOWN:      
-                object_player.location[1] += 1
+            # if event.key == pygame.K_LEFT:
+            #     object_player.location[0] += -1
+            # if event.key == pygame.K_RIGHT:
+            #     object_player.location[0] += 1
+            # if event.key == pygame.K_UP:          
+            #     object_player.location[1] += -1
+            # if event.key == pygame.K_DOWN:      
+            #     object_player.location[1] += 1
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT :
                 continue
