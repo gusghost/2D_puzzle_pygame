@@ -1,4 +1,5 @@
-from stage_valiable import *
+from stage_variable import *
+
 def stage_select(stageNum):
     stage_list = [
         [

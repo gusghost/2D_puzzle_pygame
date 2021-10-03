@@ -1,7 +1,9 @@
 from numpy.core.records import array
 import pygame
 import numpy
-import stageMap
+import stageMap 
+from stage_variable import *
+import os
 
 pygame.init()
 
@@ -9,7 +11,7 @@ pygame.init()
 screen = pygame.display.set_mode((1176,664))
 
 #caption and Icon
-
+image_directry = os.path.normpath("E:/picture/puzzle/pygame_sand/image/")
 pygame.display.set_caption("ZIKKEN")
 icon = pygame.image.load("karicon.png")
 pygame.display.set_icon(icon)
@@ -21,16 +23,16 @@ stage_num = 4
 selected_stage = stageMap.stage_gene(stage_num,sc_width, sc_height)[0]
 class map_chip_class():
     def __init__(self, location):
-        self.chipimage = ""
+        self.chipimage = n
         self.chip_location = location
         self.chip_action = "none" # none, jump, drop, stop, turn
         self.arrow_direction = [0,1]
     #BG
     def create_chip_image(self):
         # type = "string"
-        chiptype = self.chipimage
-        chiptype = chiptype.upper()
-        chipimage = pygame.image.load("{}.png".format(chiptype))
+        chiptype = str(self.chipimage)
+        # print("{}{}.png".format(image_directry,chiptype))
+        chipimage = pygame.image.load("{}\\{}.png".format(image_directry,self.chipimage))
         chipimage = pygame.transform.scale(chipimage,(100,100))
         return chipimage
 
@@ -70,13 +72,14 @@ class player_class():
     def player_move(self, x, y):
         # ほぼ描画しかしてない
         location = self.hamidasanai((x, y))
-        margin = stage_gene(stage_num)[1]
+        margin = stageMap.stage_gene(stage_num, sc_width, sc_height)[1]
         screen.blit(self.playerImg,(location[0] + margin[0], location[1] + margin[1]))
         return location
 
     def find_player_location(self, location) :
-        stage = stage_gene(stage_num)[0]
-        chipImage = create_chip_image("N")
+        stage = stageMap.stage_gene(stage_num, sc_width, sc_height)[0]
+        chipImage = pygame.image.load('N.png')
+        chipImage = pygame.transform.scale(chipImage,(100,100))
         speed  = 3
         chipW = chipImage.get_width()
         chipH = chipImage.get_height()
@@ -109,7 +112,7 @@ class player_class():
     def find_player_destination(self):
         # 現在位置、プレイヤーの向き、マップチップから目標マス座標を決める
         grid_location = []
-        stage  =stage_gene(stage_num)[0]
+        stage  =stageMap.stage_gene(stage_num, sc_width, sc_height)[0]
         direction = self.player_direction
         location = self.location
         length = max(len(stage), len(stage[0]))
@@ -145,23 +148,22 @@ object_player = player_class()
 object_player.location = object_player.player_start_point
 
 gene = stageMap.stage_gene(stage_num, sc_width, sc_height)
-object_mapchip = gene
 map  = gene[0]
+object_mapchip = map
 margin = gene[1]
 gridsizex = len(map[stage_num])
 gridsizey = len(map)
 t = "O"
 for i in range(gridsizex):
     for d in range(gridsizey):
+        chipType = map[d][i]
         object_mapchip[d][i] = map_chip_class((d,i))
-        loc = object_mapchip[d][i].chip_location
-        object_mapchip[d][i].chipimage = (1,1)
-        # map[loc[0]][loc[1]]
+        object_mapchip[d][i].chipimage = chipType
         chip = object_mapchip[d][i].create_chip_image()
-        tile = chip 
-        tileX = tile.get_width()
-        tileY = tile.get_height()
-        screen.blit(tile,(tileX*i, tileY*d))
+        # tile = chip 
+        # tileX = tile.get_width()
+        # tileY = tile.get_height()
+        # screen.blit(tile,(margin[0]+tileX*i, margin[1]+tileY*d))
 
 
 #Game Loop
@@ -192,8 +194,13 @@ while running:
                 continue
                 
     
-    
-
+    for i in range(gridsizex):
+        for d in range(gridsizey):
+            chip = object_mapchip[d][i].create_chip_image()
+            tile = chip 
+            tileX = tile.get_width()
+            tileY = tile.get_height()
+            screen.blit(tile,(margin[0]+tileX*i, margin[1]+tileY*d))
     loc =  object_player.find_player_location(object_player.location)
     
     object_player.pixel_imalocacion  = object_player.player_move(loc[0], loc[1])
