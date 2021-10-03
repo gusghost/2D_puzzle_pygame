@@ -1,21 +1,4 @@
-n = "N" 
-f = "F"
-b = "B"
-a = "A"
-
-au = "AU"
-al = "AL"
-ar = "AR"
-ad = "AD"
-
-c = "C"
-p = "P"
-h = "H"
-o = "O"
-s = "S"
-g = "G"
-
-
+from stage_valiable import *
 def stage_select(stageNum):
     stage_list = [
         [
@@ -46,3 +29,16 @@ def stage_select(stageNum):
     ]
     stage = stage_list[stageNum]
     return stage
+
+def stage_gene(stage_No, sc_width, sc_height,scale =100):
+
+    W = scale
+    H = scale
+    stage = stage_select(stage_No)
+    stageW = len(stage[0])
+    stageH = len(stage)
+    marginX = (sc_width-(stageW*W))/2
+    marginH = (sc_height-(stageH*H))/2
+    margin = (marginX, marginH)
+
+    return stage, margin

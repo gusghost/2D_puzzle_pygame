@@ -9,6 +9,7 @@ pygame.init()
 screen = pygame.display.set_mode((1176,664))
 
 #caption and Icon
+
 pygame.display.set_caption("ZIKKEN")
 icon = pygame.image.load("karicon.png")
 pygame.display.set_icon(icon)
@@ -17,41 +18,29 @@ sc_height = pygame.display.get_window_size()[1]
 
 #Player
 stage_num = 4
-selected_stage = stage_gene(stage_num)
+selected_stage = stageMap.stage_gene(stage_num,sc_width, sc_height)[0]
 class map_chip_class():
     def __init__(self, location):
-        self.chipType = ""
+        self.chipimage = ""
         self.chip_location = location
         self.chip_action = "none" # none, jump, drop, stop, turn
         self.arrow_direction = [0,1]
     #BG
     def create_chip_image(self):
         # type = "string"
-        chiptype = self.chiptype
+        chiptype = self.chipimage
+        chiptype = chiptype.upper()
         chipimage = pygame.image.load("{}.png".format(chiptype))
         chipimage = pygame.transform.scale(chipimage,(100,100))
         return chipimage
-
-    def stage_gene(self, stage_No=0):
-        chip = self.create_chip_image("O")
-        W = chip.get_width()
-        H = chip.get_height()
-
-        stage = stageMap.stage_select(stage_No)
-        stageW = len(stage[0])
-        stageH = len(stage)
-        marginX = (sc_width-(stageW*W))/2
-        marginH = (sc_height-(stageH*H))/2
-        margin = (marginX, marginH)
-        return stage, margin
 
     def get_chip_attr(self):
 
         return
 
-def tiling_chip(self, index):
+def tiling_chip(index, image):
         # index = int
-        gene = stage_gene(index)
+        gene = stageMap.stage_gene(index, sc_width, sc_height)
         map  = gene[0]
         margin = gene[1]
         gridsizex = len(map[index])
@@ -61,7 +50,7 @@ def tiling_chip(self, index):
         for i in range(gridsizex):
             for d in range(gridsizey):
                 t = map[d][i]
-                tile = create_chip_image(t)   
+                tile = image  
                 tileX = tile.get_width()
                 tileY = tile.get_height()
                 screen.blit(tile,(margin[0]+tileX*i, margin[1] + tileY*d))
@@ -154,6 +143,27 @@ def puzzle_select():
 
 object_player = player_class()
 object_player.location = object_player.player_start_point
+
+gene = stageMap.stage_gene(stage_num, sc_width, sc_height)
+object_mapchip = gene
+map  = gene[0]
+margin = gene[1]
+gridsizex = len(map[stage_num])
+gridsizey = len(map)
+t = "O"
+for i in range(gridsizex):
+    for d in range(gridsizey):
+        object_mapchip[d][i] = map_chip_class((d,i))
+        loc = object_mapchip[d][i].chip_location
+        object_mapchip[d][i].chipimage = (1,1)
+        # map[loc[0]][loc[1]]
+        chip = object_mapchip[d][i].create_chip_image()
+        tile = chip 
+        tileX = tile.get_width()
+        tileY = tile.get_height()
+        screen.blit(tile,(tileX*i, tileY*d))
+
+
 #Game Loop
 running = True
 
@@ -181,7 +191,9 @@ while running:
             if event.key == pygame.K_UP or event.key == pygame.K_DOWN :
                 continue
                 
-    tiling_chip(stage_num)
+    
+    
+
     loc =  object_player.find_player_location(object_player.location)
     
     object_player.pixel_imalocacion  = object_player.player_move(loc[0], loc[1])

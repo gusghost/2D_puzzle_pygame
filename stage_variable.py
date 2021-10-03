@@ -1,0 +1,16 @@
+n = "N" 
+f = "F"
+b = "B"
+a = "A"
+
+au = "AU"
+al = "AL"
+ar = "AR"
+ad = "AD"
+
+c = "C"
+p = "P"
+h = "H"
+o = "O"
+s = "S"
+g = "G"
