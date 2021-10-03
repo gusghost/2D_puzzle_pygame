@@ -1,6 +1,7 @@
 from numpy.core.records import array
 import pygame
 import numpy
+import stageMap
 
 pygame.init()
 
@@ -13,22 +14,6 @@ icon = pygame.image.load("karicon.png")
 pygame.display.set_icon(icon)
 sc_width = pygame.display.get_window_size()[0]
 sc_height = pygame.display.get_window_size()[1]
-n = "N" 
-f = "F"
-b = "B"
-a = "A"
-
-au = "AU"
-al = "AL"
-ar = "AR"
-ad = "AD"
-
-c = "C"
-p = "P"
-h = "H"
-o = "O"
-s = "S"
-g = "G"
 
 #Player
 
@@ -78,7 +63,6 @@ class player_class():
         imalocationX += numpy.sign(mokuhyou[0]) * min(abs(mokuhyou[0]), speed)
         mokuhyou[1] = mokuhyou[1] - imalocation[1]
         imalocationY += numpy.sign(mokuhyou[1]) * min(abs(mokuhyou[1]), speed)
-        print(min(abs(mokuhyou[1]), speed), numpy.sign(mokuhyou[1]))
         # margin = stage_gene(stage_num)[1]
         # imalocationX += margin[0]
         # imalocationY += margin[1]
@@ -136,31 +120,11 @@ def update_map():
     return map_array
 
 def stage_gene(stage_No=0):
-    stage_list = [[
-        [n,n,s],
-        [n,n,p],
-        [g,p,n]
-    ],[
-        [g,a,s],
-        [h,f,p],
-        [n,p,n]
-    ],[
-        [o,p,o,o,n,g],
-        [p,n,p,n,n,n],
-        [p,n,h,h,p,n],
-        [s,n,n,n,n,p]
-    ],[
-        [o,a,o,b,o],
-        [o,a,n,b,n],
-        [o,a,n,b,n],
-        [g,a,n,b,n]
-    ]
-    ]
     chip = create_chip_image("O")
     W = chip.get_width()
     H = chip.get_height()
 
-    stage = stage_list[stage_No]
+    stage = stageMap.stage_select(stage_No)
     stageW = len(stage[0])
     stageH = len(stage)
     marginX = (sc_width-(stageW*W))/2
@@ -196,11 +160,9 @@ while running:
                 continue
                 
     tiling_chip(stage_num)
-    print(object_player.location)
     loc =  object_player.find_player_location(object_player.location)
     
     object_player.pixel_imalocacion  = object_player.player_move(loc[0], loc[1])
-    print(object_player.pixel_imalocacion)
     pygame.display.update()
 
 surface = pygame.image.load('N.png').convert()
