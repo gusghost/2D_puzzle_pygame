@@ -3,6 +3,10 @@ from stage_variable import *
 def stage_select(stageNum):
     stage_list = [
         [
+            [s,n],
+            [n,g]
+        ],
+        [
             [n,n,s],
             [n,n,p],
             [g,p,n]
@@ -21,11 +25,11 @@ def stage_select(stageNum):
             [o,a,n,b,n],
             [g,a,n,b,n]
         ],[
-            [o,a,o,b,o,n,n,n],
+            [o,a,o,b,o,n,n,g],
             [o,a,n,b,n,n,a,n],
             [o,a,n,b,n,n,n,n],
-            [g,a,n,b,n,n,n,n],
-            [g,a,n,b,n,o,o,o]
+            [o,a,n,b,n,n,n,n],
+            [s,a,n,b,n,o,o,o]
         ]
     ]
     stage = stage_list[stageNum]

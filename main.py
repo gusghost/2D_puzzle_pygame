@@ -19,7 +19,7 @@ sc_width = pygame.display.get_window_size()[0]
 sc_height = pygame.display.get_window_size()[1]
 
 #Player
-stage_num = 4
+stage_num = 5
 selected_stage = stageMap.stage_gene(stage_num,sc_width, sc_height)[0]
 class map_chip_class():
     def __init__(self, location):
@@ -30,8 +30,6 @@ class map_chip_class():
     #BG
     def create_chip_image(self):
         # type = "string"
-        chiptype = str(self.chipimage)
-        # print("{}{}.png".format(image_directry,chiptype))
         chipimage = pygame.image.load("{}\\{}.png".format(image_directry,self.chipimage))
         chipimage = pygame.transform.scale(chipimage,(100,100))
         return chipimage
@@ -63,8 +61,9 @@ class player_class():
         self.location = [0,0] # grid zahyou
         self.playerImg = pygame.image.load('image0.png')
         self.playerImg =  pygame.transform.scale(self.playerImg,(120,300))
-        self.player_start_point = [2,1] # grid
-        self.pixel_imalocacion = [0, 0]
+        self.player_start_point = [6,4] # grid
+        self.pixel_imalocation = [0, 0]
+        #self.grid_imalocation = [0,0]
         self.player_direction = [1,0] # Up[0,-1], Down[0,1], Left[-1,0], Right[1,0]
         self.player_status = ""
         self.player_HP = 20
@@ -97,17 +96,17 @@ class player_class():
         standingPointX -= (self.playerImg.get_width()/2)
         standingPointY -= self.playerImg.get_height()
         mokuhyou = [standingPointX,standingPointY]
-
-        imalocation = self.pixel_imalocacion
-        imalocationX = self.pixel_imalocacion[0]
-        imalocationY = self.pixel_imalocacion[1]
+        ret_mokuhyou = mokuhyou
+        imalocation = self.pixel_imalocation
+        imalocationX = self.pixel_imalocation[0]
+        imalocationY = self.pixel_imalocation[1]
 
         mokuhyou[0] = mokuhyou[0] - imalocation[0]
         imalocationX += numpy.sign(mokuhyou[0]) * min(abs(mokuhyou[0]), speed)
         mokuhyou[1] = mokuhyou[1] - imalocation[1]
         imalocationY += numpy.sign(mokuhyou[1]) * min(abs(mokuhyou[1]), speed)
 
-        return (imalocationX, imalocationY)
+        return (imalocationX, imalocationY), ret_mokuhyou
 
     def find_player_destination(self):
         # 現在位置、プレイヤーの向き、マップチップから目標マス座標を決める
@@ -116,12 +115,18 @@ class player_class():
         direction = self.player_direction
         location = self.location
         length = max(len(stage), len(stage[0]))
+        chip = n
         for i in range(length):
-            location = location + direction 
-            chip = stage[location[0]][location[1]]
-            
+            try:
+                location[0] += direction[0] 
+                location[1] += direction[1] 
+                chip = stage[location[0]][location[1]]
+            except Exception as e:
+                continue
+            if chip == n or chip == s or chip == b or chip == f:
+                self.location = location
+                
 
-        grid_location = []
         return grid_location
 
     def hamidasanai(self, location):
@@ -138,6 +143,26 @@ class player_class():
             playerY = sc_height - self.playerImg.get_height()
         
         return (playerX, playerY)
+    
+    def reset_player_in_startPoint(self):
+        startpixelpoint = self.find_player_location(self.location)[1]
+        self.pixel_imalocation = startpixelpoint
+
+    def find_start_mapchip(self):
+        startmap = stageMap.stage_gene(stage_num,sc_height,sc_width)[0]
+        gridsizex = len(startmap[0])
+        gridsizey = len(startmap)    
+        for i in range(gridsizex):
+            for d in range(gridsizey):
+                if startmap[d][i] == s:
+                    self.player_start_point = [1+i,1+d] #今はあれだけど逆だからあとで直してね
+
+
+
+def  testdback( text, gyou=1):
+    mozi = pygame.font.Font(None,50)
+    mozimozi = mozi.render(text, True,(0,0,0))
+    screen.blit(mozimozi,[50,60*gyou])
 
 def puzzle_select():
     # 後でちゃんと書いてね
@@ -145,26 +170,22 @@ def puzzle_select():
     return stage_bangou
 
 object_player = player_class()
+object_player.find_start_mapchip()
 object_player.location = object_player.player_start_point
-
+object_player.reset_player_in_startPoint()
 gene = stageMap.stage_gene(stage_num, sc_width, sc_height)
 map  = gene[0]
 object_mapchip = map
 margin = gene[1]
-gridsizex = len(map[stage_num])
+gridsizex = len(map[0])
 gridsizey = len(map)
-t = "O"
+t = "N"
 for i in range(gridsizex):
     for d in range(gridsizey):
         chipType = map[d][i]
         object_mapchip[d][i] = map_chip_class((d,i))
         object_mapchip[d][i].chipimage = chipType
         chip = object_mapchip[d][i].create_chip_image()
-        # tile = chip 
-        # tileX = tile.get_width()
-        # tileY = tile.get_height()
-        # screen.blit(tile,(margin[0]+tileX*i, margin[1]+tileY*d))
-
 
 #Game Loop
 running = True
@@ -179,14 +200,14 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 puzzle_state = 1 # 適当に書いている
-            # if event.key == pygame.K_LEFT:
-            #     object_player.location[0] += -1
-            # if event.key == pygame.K_RIGHT:
-            #     object_player.location[0] += 1
-            # if event.key == pygame.K_UP:          
-            #     object_player.location[1] += -1
-            # if event.key == pygame.K_DOWN:      
-            #     object_player.location[1] += 1
+            if event.key == pygame.K_LEFT:
+                object_player.player_direction = [-1,0] 
+            elif event.key == pygame.K_RIGHT:
+                object_player.player_direction = [1,0] 
+            elif event.key == pygame.K_UP:          
+                object_player.player_direction = [0,-1] 
+            elif event.key == pygame.K_DOWN:      
+                object_player.player_direction = [0,1] 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT :
                 continue
@@ -201,9 +222,15 @@ while running:
             tileX = tile.get_width()
             tileY = tile.get_height()
             screen.blit(tile,(margin[0]+tileX*i, margin[1]+tileY*d))
-    loc =  object_player.find_player_location(object_player.location)
+
+    object_player.find_player_destination()
+
+    loc =  object_player.find_player_location(object_player.location)[0]
     
-    object_player.pixel_imalocacion  = object_player.player_move(loc[0], loc[1])
+    object_player.pixel_imalocation  = object_player.player_move(loc[0], loc[1])
+    object_player.grid_imalocation = [0,0]
+    testdback(str(object_player.location), 1)
+    testdback(str(object_player.pixel_imalocation), 2)
     pygame.display.update()
 
 surface = pygame.image.load('N.png').convert()
