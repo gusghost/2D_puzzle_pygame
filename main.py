@@ -21,46 +21,43 @@ sc_height = pygame.display.get_window_size()[1]
 #Player
 stage_num = 5
 selected_stage = stageMap.stage_gene(stage_num,sc_width, sc_height)[0]
-class map_chip_class():
-    def __init__(self, location):
-        self.chipimage = n
-        self.chip_location = location
-        self.chip_action = "none" # none, jump, drop, stop, turn
-        self.arrow_direction = [0,1]
-    #BG
-    def create_chip_image(self):
-        # type = "string"
-        chipimage = pygame.image.load("{}\\{}.png".format(image_directry,self.chipimage))
-        chipimage = pygame.transform.scale(chipimage,(100,100))
-        return chipimage
 
-    def get_chip_attr(self):
+chipimage = n
+chip_location = [0,0]
+chip_action = "none" # none, jump, drop, stop, turn
+arrow_direction = [0,1]
 
-        return
+def create_chip_image(type):
+    # type = "string"
+    image = pygame.image.load("{}\\{}.png".format(image_directry, type))
+    image = pygame.transform.scale(image,(100,100))
+    return image
 
-def tiling_chip(index, image):
-        # index = int
-        gene = stageMap.stage_gene(index, sc_width, sc_height)
-        map  = gene[0]
-        margin = gene[1]
-        gridsizex = len(map[index])
-        gridsizey = len(map)
+def tiling_chip(stage_num):
+    index = stage_num
+    gene = stageMap.stage_gene(index, sc_width, sc_height)
+    map  = gene[0]
+    margin = gene[1]
+    gridsizex = len(map[0])
+    gridsizey = len(map)
 
-        t = "O"
-        for i in range(gridsizex):
-            for d in range(gridsizey):
-                t = map[d][i]
-                tile = image  
-                tileX = tile.get_width()
-                tileY = tile.get_height()
-                screen.blit(tile,(margin[0]+tileX*i, margin[1] + tileY*d))
+    t = "O"
+    for i in range(gridsizex):
+        for d in range(gridsizey):
+            t = map[d][i]
+            tile = create_chip_image(t) 
+            tileX = tile.get_width()
+            tileY = tile.get_height()
+            screen.blit(tile,(margin[0]+tileX*i, margin[1] + tileY*d))
 
 class player_class():
 
     def __init__(self) :
+        scale = 12
         self.location = [0,0] # grid zahyou
         self.playerImg = pygame.image.load('image0.png')
-        self.playerImg =  pygame.transform.scale(self.playerImg,(120,300))
+        self.playerImg =  pygame.transform.scale(self.playerImg,(int(self.playerImg.get_width()/scale),
+                                                int(self.playerImg.get_height()/scale)))
         self.player_start_point = [6,4] # grid
         self.pixel_imalocation = [0, 0]
         #self.grid_imalocation = [0,0]
@@ -79,7 +76,7 @@ class player_class():
         stage = stageMap.stage_gene(stage_num, sc_width, sc_height)[0]
         chipImage = pygame.image.load('N.png')
         chipImage = pygame.transform.scale(chipImage,(100,100))
-        speed  = 3
+        speed  = 2
         chipW = chipImage.get_width()
         chipH = chipImage.get_height()
         map_gridX = len(stage[0])
@@ -121,7 +118,10 @@ class player_class():
                 location[0] += direction[0] 
                 location[1] += direction[1] 
                 chip = stage[location[0]][location[1]]
+                text =  str("ある", chip, location)
+
             except Exception as e:
+                print("失敗")
                 continue
             if chip == n or chip == s or chip == b or chip == f:
                 self.location = location
@@ -173,20 +173,11 @@ object_player = player_class()
 object_player.find_start_mapchip()
 object_player.location = object_player.player_start_point
 object_player.reset_player_in_startPoint()
-gene = stageMap.stage_gene(stage_num, sc_width, sc_height)
-map  = gene[0]
-object_mapchip = map
-margin = gene[1]
-gridsizex = len(map[0])
-gridsizey = len(map)
-t = "N"
-for i in range(gridsizex):
-    for d in range(gridsizey):
-        chipType = map[d][i]
-        object_mapchip[d][i] = map_chip_class((d,i))
-        object_mapchip[d][i].chipimage = chipType
-        chip = object_mapchip[d][i].create_chip_image()
 
+screen.fill((200, 200, 200))
+tiling_chip(stage_num)
+pygame.image.save(screen, os.path.join(image_directry,"generated_BG.png") )
+stage_BG = pygame.image.load(os.path.join(image_directry,"generated_BG.png"))
 #Game Loop
 running = True
 
@@ -213,24 +204,18 @@ while running:
                 continue
             if event.key == pygame.K_UP or event.key == pygame.K_DOWN :
                 continue
-                
-    
-    for i in range(gridsizex):
-        for d in range(gridsizey):
-            chip = object_mapchip[d][i].create_chip_image()
-            tile = chip 
-            tileX = tile.get_width()
-            tileY = tile.get_height()
-            screen.blit(tile,(margin[0]+tileX*i, margin[1]+tileY*d))
 
+
+    screen.blit(stage_BG,(0,0))
     object_player.find_player_destination()
-
     loc =  object_player.find_player_location(object_player.location)[0]
     
     object_player.pixel_imalocation  = object_player.player_move(loc[0], loc[1])
     object_player.grid_imalocation = [0,0]
+
     testdback(str(object_player.location), 1)
     testdback(str(object_player.pixel_imalocation), 2)
+
     pygame.display.update()
 
 surface = pygame.image.load('N.png').convert()
