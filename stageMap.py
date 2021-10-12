@@ -7,11 +7,11 @@ def stage_select(stageNum):
             [n,g]
         ],
         [
-            [n,n,s],
+            [ar,n,s],
             [n,n,p],
             [g,p,n]
         ],[
-            [g,a,s],
+            [g,ad,s],
             [h,f,p],
             [n,p,n]
         ],[
@@ -20,16 +20,16 @@ def stage_select(stageNum):
             [p,n,h,h,p,n],
             [s,n,n,n,n,p]
         ],[
-            [o,a,o,b,o],
-            [o,a,n,b,n],
-            [o,a,n,b,n],
-            [g,a,n,b,n]
+            [o,ad,o,b,o],
+            [o,ad,n,b,n],
+            [o,ad,n,b,n],
+            [g,ad,n,b,n]
         ],[
-            [o,a,o,b,o,n,n,g],
-            [o,a,n,b,n,n,a,n],
-            [o,a,n,b,n,n,n,n],
-            [o,a,n,b,n,n,n,n],
-            [s,a,n,b,n,o,o,o]
+            [o,ad,o,b,o,n,n,g],
+            [o,ad,n,b,n,n,ad,n],
+            [o,ad,n,b,n,n,n,n],
+            [o,ad,n,b,n,n,n,n],
+            [s,ad,n,b,n,o,o,o]
         ]
     ]
     stage = stage_list[stageNum]
@@ -47,3 +47,20 @@ def stage_gene(stage_No, sc_width, sc_height,scale =100):
     margin = (marginX, marginH)
 
     return stage, margin
+
+def chip_effect(type):
+
+    # walk, dash, jump, drop, stop, turn
+
+    Zokusei= {
+        au:("turn",[0,-1]),ad:("turn",[0,1]),al:("turn",[1,0]),ar:("turn",[-1,0])
+        ,n:("walk",[0,0])
+        ,h:("walk",[0,0])
+        ,b:("jump",[0,0])
+        ,f:("dash",[0,0])
+        ,p:("drop",[0,0])
+        ,s:("walk",[0,0]), g:("stop",[0,0])
+        
+    }
+
+    return Zokusei[type]
