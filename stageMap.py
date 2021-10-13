@@ -7,11 +7,11 @@ def stage_select(stageNum):
             [n,g]
         ],
         [
-            [ar,n,s],
+            [n,n,s],
             [n,n,p],
             [g,p,n]
         ],[
-            [g,ad,s],
+            [g,a,s],
             [h,f,p],
             [ar,p,au]
         ],[
@@ -25,11 +25,11 @@ def stage_select(stageNum):
             [o,ad,s,b,n],
             [g,ad,n,b,n]
         ],[
-            [o,ad,o,b,o,n,n,g],
-            [o,ad,n,b,n,n,ad,n],
-            [o,ad,n,b,n,n,n,n],
-            [o,ad,n,b,n,n,n,n],
-            [s,ad,n,b,n,o,o,o]
+            [o,a,o,b,o,n,n,g],
+            [o,a,n,b,n,n,a,n],
+            [o,a,n,b,n,n,n,n],
+            [o,a,n,b,n,n,n,n],
+            [s,a,n,b,n,o,o,o]
         ]
     ]
     stage = stage_list[stageNum]
@@ -44,7 +44,7 @@ def stage_gene(stage_No, sc_width, sc_height,scale =100):
     stageH = len(stage)
     marginW = (sc_width-(stageW*W))/2
     marginH = (sc_height-(stageH*H))/2
-    margin = (marginH, marginW)
+    margin = (marginW, marginH)
 
     return stage, margin
 
