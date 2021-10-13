@@ -17,12 +17,12 @@ def stage_select(stageNum):
         ],[
             [o,p,o,o,n,g],
             [p,n,p,n,n,n],
-            [p,n,h,h,p,n],
-            [s,n,n,n,n,p]
+            [p,n,s,h,p,n],
+            [n,n,n,n,n,p]
         ],[
             [o,ad,o,b,o],
             [o,ad,n,b,n],
-            [o,ad,n,b,n],
+            [o,ad,s,b,n],
             [g,ad,n,b,n]
         ],[
             [o,ad,o,b,o,n,n,g],

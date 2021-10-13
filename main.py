@@ -1,9 +1,12 @@
-import pygame
-import numpy
-import stageMap 
-from stage_variable import *
-import os
 import glob
+import os
+
+import numpy
+import pygame
+from genericpath import exists
+
+import stageMap
+from stage_variable import *
 
 pygame.init()
 
@@ -74,7 +77,7 @@ class sprite_player_class(pygame.sprite.Sprite):
         super(sprite_player_class, self).__init__()
 
         scale = 12
-        self.location = [0,0] # grid zahyou
+        self.location = [0,0] # grid zahyou 原点は０，０。[Y,X]
         names = glob.glob(image_directry+"//chara1 (*).png")
         names = glob.glob(image_directry+"//image0.png")
         self.playerImages = [None]*len(names)
@@ -87,7 +90,7 @@ class sprite_player_class(pygame.sprite.Sprite):
                                                 int(self.playerImages[i].get_height()/scale)))
         self.playerImage = self.playerImages[self.player_index]
         self.rect = self.playerImage.get_rect()
-        self.player_start_point = [6,4] # grid
+        self.player_start_point = [0,0] # grid
         self.pixel_imalocation = [0, 0]
         self.player_direction = [1,0] # [Y, X]で表記するUp[-1,0], Down[1,0], Left[0,-1], Right[0,1]
         self.player_status = ""
@@ -102,7 +105,7 @@ class sprite_player_class(pygame.sprite.Sprite):
         stage = stageMap.stage_gene(stage_num, sc_width, sc_height)[0]
         chipImage = pygame.image.load('N.png')
         chipImage = pygame.transform.scale(chipImage,(100,100))
-        speed  = 5
+        speed  = 3
         # 変数を計算する
         chipW = chipImage.get_width()
         chipH = chipImage.get_height()
@@ -110,17 +113,15 @@ class sprite_player_class(pygame.sprite.Sprite):
         map_gridY = len(stage)
         standingPointX = 0
         standingPointY = 0
+        # tmp_location = [0,0]
         # マス座標をステージのサイズに制限する
-        location[0] = max(location[0], 1)
-        location[0] = min(location[0], map_gridX)
-        location[1] = max(location[1], 1)
-        location[1] = min(location[1], map_gridY)
+        tmp_location = grid_hamidasanai(location)
         # ここからピクセル座標を計算し始める
         # チップの画像サイズをもとにして計算
         # 画像の右下を基準にして-(chipH/3)-(chipW/2)
         # はマップチップの上に立ってるように見せかけるためにずらしてる
-        standingPointY = location[0]*chipW-(chipW/2)
-        standingPointX = location[1]*chipH-(chipH/3)
+        standingPointY = (tmp_location[0]+1)*chipW-(chipW/2)
+        standingPointX = (tmp_location[1]+1)*chipH-(chipH/3)
         # 描画位置のために右上になるように計算する
         standingPointX -= (player_dummy_image.get_width()/2)
         standingPointY -= player_dummy_image.get_height()
@@ -129,15 +130,15 @@ class sprite_player_class(pygame.sprite.Sprite):
         imalocation = self.pixel_imalocation
         imalocationY = self.pixel_imalocation[0]
         imalocationX = self.pixel_imalocation[1]
-
+        # 目標が超振動を起こしているみたい
         mokuhyou[0] = mokuhyou[0] - imalocation[0]
         imalocationY += numpy.sign(mokuhyou[0]) * min(abs(mokuhyou[0]), speed)
         mokuhyou[1] = mokuhyou[1] - imalocation[1]
         imalocationX += numpy.sign(mokuhyou[1]) * min(abs(mokuhyou[1]), speed)
 
         margin = stageMap.stage_gene(stage_num, sc_width, sc_height)[1]
-        self.rect = (imalocationX+margin[0], imalocationY+margin[1])
-        return (imalocationX, imalocationX), ret_mokuhyou
+        self.rect = (imalocationX, imalocationY)
+        return (imalocationX, imalocationY), ret_mokuhyou
 
     def find_player_destination(self):
         # 現在位置、プレイヤーの向き、マップチップから目標マス座標を決める
@@ -145,27 +146,30 @@ class sprite_player_class(pygame.sprite.Sprite):
         location = self.location
         stage  = selected_stage
         # print(location,stage)
-        zokusei = stageMap.chip_effect(stage[location[1]-1][location[0]-1])
+        zokusei = stageMap.chip_effect(stage[location[0]][location[1]])
         testdback(str(zokusei), 4)
         # if zokusei[0] == "turn":
         #     self.player_direction = zokusei[1]
 
         direction = self.player_direction
-        length = max(len(stage), len(stage[0]))
+        length = max(len(stage)*numpy.sign(direction[0]), len(stage[0])*numpy.sign(direction[1]))
         chip = n
         for i in range(length):
-            try:
-                location[0] += direction[0] 
-                location[1] += direction[1] 
-                chip = stage[location[0]][location[1]]
-                zoc = stageMap.chip_effect(chip)
-                if zokusei[0] == "turn":
-                    self.player_direction = zokusei[1]
-
-
-            except Exception as e:
-                continue
-            self.location = location
+            
+            if location[0]+direction[0] >= length:
+                break
+            chip = stage[location[0]][location[1]]
+            zokusei = stageMap.chip_effect(chip)
+            if zokusei[0] == "turn":
+                self.player_direction = zokusei[1]
+            elif zokusei[0] == "walk":
+                a = 1
+            elif zokusei[0]== "stop":
+                break
+            location[0] += direction[0] 
+            location[1] += direction[1]         
+            
+        self.location = location
         return grid_location
 
     def hamidasanai(self, location):
@@ -183,10 +187,10 @@ class sprite_player_class(pygame.sprite.Sprite):
         elif playerY>= sc_height- player_dummy_image.get_height():
             playerY = sc_height - player_dummy_image.get_height()
         
-        return (playerX, playerY)
+        return (playerY, playerX)
     
     def reset_player_in_startPoint(self):
-        startpixelpoint = self.find_player_location(self.location)[1]
+        startpixelpoint = self.find_player_location(self.player_start_point)[1]
         self.pixel_imalocation = startpixelpoint
 
     def find_start_mapchip(self):
@@ -196,7 +200,7 @@ class sprite_player_class(pygame.sprite.Sprite):
         for x in range(gridsizex):
             for y in range(gridsizey):
                 if startmap[y][x] == s:
-                    self.player_start_point = [y+1,x+1] #今はあれだけど逆だからあとで直してね
+                    self.player_start_point = [y,x]
 
     def update(self):
 
@@ -207,7 +211,17 @@ class sprite_player_class(pygame.sprite.Sprite):
         self.playerImage = self.playerImages[self.player_index]
         self.player_index += 1                   
 
-
+def grid_hamidasanai(location):
+    stage = stageMap.stage_gene(stage_num, sc_width, sc_height)[0]
+    map_gridX = len(stage[0])
+    map_gridY = len(stage)
+    tmp_location = location
+    # マス座標をステージのサイズに制限する
+    tmp_location[0] = max(location[0], 1)
+    tmp_location[0] = min(location[0], map_gridX)
+    tmp_location[1] = max(location[1], 1)
+    tmp_location[1] = min(location[1], map_gridY)
+    return tmp_location
 
 def  testdback( text, gyou=1):
     mozi = pygame.font.Font(None,40)
@@ -233,7 +247,8 @@ running = True
 
 while running:
      #RGB- Red, Green, Blue
-    screen.fill((200, 200, 200))
+    # screen.fill((200, 200, 200))
+    screen.blit(stage_BG,(0,0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -257,7 +272,6 @@ while running:
     fps = pygame.time.Clock().get_fps()
     time1 = pygame.time.Clock().tick(fps)
 
-    screen.blit(stage_BG,(0,0))
     object_player.find_player_destination()
     loc =  object_player.find_player_location(object_player.location)[0]
     
