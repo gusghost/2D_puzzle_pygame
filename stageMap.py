@@ -2,7 +2,7 @@ from stage_variable import *
 
 def stage_select(stageNum):
     stage_list = [
-        [
+        [#0
             [s,n],
             [n,g]
         ],
@@ -14,17 +14,17 @@ def stage_select(stageNum):
             [g,ad,s],
             [h,f,p],
             [n,p,n]
-        ],[
-            [o,p,o,o,n,g],
+        ],[#3
+            [au,p,o,o,n,ad],
             [p,n,p,n,n,n],
-            [p,n,h,h,p,n],
-            [s,n,n,n,n,p]
+            [p,s,h,h,p,n],
+            [au,n,n,n,n,al]
         ],[
             [o,ad,o,b,o],
             [o,ad,n,b,n],
             [o,ad,n,b,n],
             [g,ad,n,b,n]
-        ],[
+        ],[#5
             [o,ad,o,b,o,n,n,g],
             [o,ad,n,b,n,n,ad,n],
             [o,ad,n,b,n,n,n,n],
@@ -59,7 +59,7 @@ def chip_effect(type):
         ,b:("jump",[0,0])
         ,f:("dash",[0,0])
         ,p:("drop",[0,0])
-        ,s:("walk",[0,0]), g:("stop",[0,0])
+        ,s:("walk",[0,0]), g:("stop",[0,0]), o:("stop",[0,0]), c:("walk",[0,0])
         
     }
 

@@ -20,7 +20,7 @@ sc_width = pygame.display.get_window_size()[0]
 sc_height = pygame.display.get_window_size()[1]
 
 #Player
-stage_num = 2
+stage_num = 3
 selected_stage = stageMap.stage_gene(stage_num,sc_width, sc_height)[0]
 
 chipimage = n
@@ -145,13 +145,16 @@ class sprite_player_class(pygame.sprite.Sprite):
         stage  = selected_stage
 
         print(location,stage)
-        zokusei = stageMap.chip_effect(stage[location[0]-1][location[1]-1])
-        if zokusei[0] == "turn":
-            self.player_direction = zokusei[1]
+        zokusei = stageMap.chip_effect(stage[location[1]-1][location[0]-1]) #stageのインデックスが[y][x]
 
         direction = self.player_direction
         length = max(len(stage), len(stage[0]))
         chip = n
+        if zokusei[0] == "turn":
+            self.player_direction = zokusei[1]
+        elif zokusei[0] == "stop":
+            self.player_direction = zokusei[1]
+
         for i in range(length):
             try:
                 location[0] += direction[0] 
