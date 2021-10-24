@@ -15,7 +15,7 @@ def stage_select(stageNum):
             [h,f,p],
             [n,p,n]
         ],[#3
-            [au,p,o,o,n,ad],
+            [au,p,o,p,n,ad],
             [p,n,p,n,n,n],
             [p,s,h,h,p,n],
             [au,n,n,n,n,al]
@@ -59,7 +59,7 @@ def chip_effect(type):
         ,b:("jump",[0,0])
         ,f:("dash",[0,0])
         ,p:("drop",[0,0])
-        ,s:("walk",[0,0]), g:("stop",[0,0]), o:("stop",[0,0]), c:("walk",[0,0])
+        ,s:("walk",[0,0]), g:("stop",[0,0]), o:("stop",[0,0]), c:("drop",[0,0])
         
     }
 

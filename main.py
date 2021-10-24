@@ -150,17 +150,20 @@ class sprite_player_class(pygame.sprite.Sprite):
         direction = self.player_direction
         length = max(len(stage), len(stage[0]))
         chip = n
-        if zokusei[0] == "turn":
-            self.player_direction = zokusei[1]
-        elif zokusei[0] == "stop":
-            self.player_direction = zokusei[1]
-
+        
         for i in range(length):
             try:
                 location[0] += direction[0] 
                 location[1] += direction[1] 
-                chip = stage[location[0]][location[1]]
-                # text =  str("ある", chip, location)
+                zokusei = stageMap.chip_effect(stage[location[1]-1][location[0]-1]) #stageのインデックスが[y][x]
+
+                if zokusei[0] == "stop" or stage[location[1]-1][location[0]-1] == h:
+                    location[0] -= direction[0] 
+                    location[1] -= direction[1] 
+                    continue
+                # elif zokusei[0] == "drop" :
+                #     location[0] = 1
+
 
             except Exception as e:
                 continue
@@ -195,6 +198,9 @@ class sprite_player_class(pygame.sprite.Sprite):
             for d in range(gridsizey):
                 if startmap[d][i] == s:
                     self.player_start_point = [1+i,1+d] #今はあれだけど逆だからあとで直してね
+
+    def ():#mapchipで動きを分岐するヤツ
+
 
     def update(self):
 
