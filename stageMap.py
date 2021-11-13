@@ -15,10 +15,10 @@ def stage_select(stageNum):
             [h,f,p],
             [n,p,n]
         ],[#3
-            [au,p,o,p,n,ad],
-            [p,n,p,n,n,n],
-            [p,s,h,h,p,n],
-            [au,n,n,n,n,al]
+            [ar,n,n,n,n,ad],
+            [p,s,p,n,n,n],
+            [p,b,h,h,p,g],
+            [au,h,n,n,n,al]
         ],[
             [o,ad,o,b,o],
             [o,ad,n,b,n],
@@ -53,13 +53,14 @@ def chip_effect(type):
     # walk, dash, jump, drop, stop, turn
 
     Zokusei= {
-        au:("turn",[0,-1]),ad:("turn",[0,1]),al:("turn",[1,0]),ar:("turn",[-1,0])
+        # [x,y]
+        au:("turn",[0,-1]),ad:("turn",[0,1]),al:("turn",[-1,0]),ar:("turn",[1,0])
         ,n:("walk",[0,0])
         ,h:("walk",[0,0])
         ,b:("jump",[0,0])
         ,f:("dash",[0,0])
         ,p:("drop",[0,0])
-        ,s:("walk",[0,0]), g:("stop",[0,0]), o:("stop",[0,0]), c:("drop",[0,0])
+        ,s:("walk",[0,0]), g:("goal",[0,0]), o:("stop",[0,0]), c:("drop",[0,0])
         
     }
 
