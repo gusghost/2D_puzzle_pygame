@@ -6,6 +6,7 @@ import stageMap
 from stage_variable import *
 import os
 import glob
+import math
 
 pygame.init()
 
@@ -76,7 +77,7 @@ class sprite_player_class(pygame.sprite.Sprite):
         super(sprite_player_class, self).__init__()
 
         scale = 12
-        self.location = [0,0] # grid zahyou [xy]
+        self.location = [0,0,0] # grid zahyou [xyz]
         names = glob.glob(image_directry+"//chara1 (*).png")
         names = glob.glob(image_directry+"//image0.png")
         self.playerImages = [None]*len(names)
@@ -89,7 +90,7 @@ class sprite_player_class(pygame.sprite.Sprite):
                                                 int(self.playerImages[i].get_height()/scale)))
         self.playerImage = self.playerImages[self.player_index]
         self.rect = self.playerImage.get_rect()
-        self.player_start_point = [6,4] # grid
+        self.player_start_point = [6,4,0] # grid
         self.pixel_imalocation = [0, 0]
         self.pixel_mokuhyou_def = [0, 0] #  [x,y]
         self.player_direction = [0,0] # [xy] Up[0,-1], Down[0,1], Left[-1,0], Right[1,0]
@@ -100,7 +101,7 @@ class sprite_player_class(pygame.sprite.Sprite):
         screen.blit(self.playerImage,self.rect)
 
     def find_player_location(self, location) :
-        # pixel単位での座標を計算するやつだと思う
+        # pixel単位での座標を計算する
         player_dummy_image = self.playerImage
         stage = stageMap.stage_gene(stage_num, sc_width, sc_height)[0]
         chipImage = pygame.image.load('N.png')
@@ -121,37 +122,38 @@ class sprite_player_class(pygame.sprite.Sprite):
         standingPointY = location[1]*chipH-(chipH/3)
         standingPointX -= (player_dummy_image.get_width()/2)
         standingPointY -= player_dummy_image.get_height()
-        # 高い所にいるときにすこし座標を上にあげる
-        # if self.player_status == "jump" or "high1":
-        #     standingPointY -= chipH/2
-        # else:
-        #     standingPointY += chipH/2
 
         mokuhyou = [standingPointX,standingPointY]
         ret_mokuhyou = mokuhyou
         imalocation = self.pixel_imalocation
         imalocationX = self.pixel_imalocation[0]
         imalocationY = self.pixel_imalocation[1]
-
         # 少しずつ動かす所
         mokuhyou[0] = mokuhyou[0] - imalocation[0]
         imalocationX += numpy.sign(mokuhyou[0]) * min(abs(mokuhyou[0]), speed)
         mokuhyou[1] = mokuhyou[1] - imalocation[1]
         imalocationY += numpy.sign(mokuhyou[1]) * min(abs(mokuhyou[1]), speed)
+
         # 画面のマージンを足すところ
         margin = stageMap.stage_gene(stage_num, sc_width, sc_height)[1]
         self.rect = (imalocationX+margin[0], imalocationY+margin[1])
 
         self.pixel_mokuhyou_def = mokuhyou
+
         return (imalocationX, imalocationY), ret_mokuhyou
+
+    def calc_playerMove_def(self,location):
+        a =1
+
 
     def find_player_destination(self):
         # 現在位置、プレイヤーの向き、マップチップから目標マス座標を決める
         grid_location = []
         location = self.location
         stage  = selected_stage
-
-        print(location,stage)
+        print(type(location[1]))
+        if type(location[1]) is float :
+            location[1] = math.ceil(location[1])
         zokusei = stageMap.chip_effect(stage[location[1]-1][location[0]-1]) #stageのインデックスが[y][x]
         self.bunki_mapChip(stage[location[1]-1][location[0]-1])
         direction = self.player_direction
@@ -169,8 +171,8 @@ class sprite_player_class(pygame.sprite.Sprite):
                     location[1] -= direction[1] 
                 elif stage[location[1]-1][location[0]-1] == h :
                     if self.player_status == "jump":
-                        # pureiya- がジャンプ中は崖の上に乗れる
-                        continue
+                        # pureiya- がジャンプ中は崖の上に乗れる 
+                        continue    
                     else:
                         location[0] -= direction[0] 
                         location[1] -= direction[1] 
@@ -178,6 +180,7 @@ class sprite_player_class(pygame.sprite.Sprite):
                 elif zokusei[0] == "goal":
                     self.player_status = "goal"
                     self.reached_goal()
+
             except Exception as e:
                 continue
             self.location = location
@@ -210,7 +213,7 @@ class sprite_player_class(pygame.sprite.Sprite):
         for x in range(gridsizex):
             for y in range(gridsizey):
                 if startmap[y][x] == s:
-                    self.player_start_point = [1+x,1+y] 
+                    self.player_start_point = [1+x,1+y,0] 
 
     def bunki_mapChip (self, chiptype):#mapchipで動きを分岐するヤツ
         zokusei = stageMap.chip_effect(chiptype)
@@ -224,6 +227,7 @@ class sprite_player_class(pygame.sprite.Sprite):
                 a =1
             elif zokusei[0] == "jump":
                 self.player_status = "jump"
+                
             elif chiptype == h:
                 self.player_status = "high1"
             else :

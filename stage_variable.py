@@ -15,3 +15,6 @@ o = "O"
 s = "S"
 g = "G"
 # Crack Pit High Out_of_area Start Goal
+m = "M"
+# Meal
+
